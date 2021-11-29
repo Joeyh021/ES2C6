@@ -1,35 +1,71 @@
 #include <Servo.h>
 
-Servo s1;
-Servo s2;
+class LDR {
+   private:
+    int val;
+    uint8_t pin;
 
-int pos = 0;  // variable to store the servo position
+   public:
+    LDR(int pin) {
+        this->pin = pin;
+    }
 
-int LDRpin[] = {A0,A1,A2,A3};
-int LDRval[4];
+    int read() {
+        return val = analogRead(pin);
+    }
+};
+
+Servo base;
+Servo arm;
+// A | B
+// - - -
+// C | D
+
+LDR A(A3);
+LDR B(A2);
+LDR C(A1);
+LDR D(A0);
+
+void LDRdbg() {
+    Serial.print("LDR Values: A: ");
+    Serial.print(A.read());
+    Serial.print(" B: ");
+    Serial.print(B.read());
+    Serial.print(" C: ");
+    Serial.print(C.read());
+    Serial.print(" D: ");
+    Serial.print(D.read());
+    Serial.println();
+}
+
 void setup() {
-    s1.attach(9);  // attaches the servo on pin 9 to the servo object
-    s2.attach(11);
+    // init serial monitor
     Serial.begin(9600);
+    arm.attach(9);
+    arm.write(90);
+    base.attach(11);
+    base.write(90);
 }
 
 void loop() {
-    for(int i=0; i <4 ; i++){
-      LDRval[i] = analogRead(LDRpin[i]);
-      Serial.print(LDRval[i]);
-      Serial.print(" ");
-    }
-    Serial.print("\n");
-    for (pos = 0; pos <= 180; pos += 1) {  // goes from 0 degrees to 180 degrees
-        // in steps of 1 degree
-        s1.write(pos);  
-        s2.write(pos);
-        delay(5);         
-    }
-    for (pos = 180; pos >= 0; pos -= 1) {  // goes from 180 degrees to 0 degrees
-        s1.write(pos);
-        s1.write(pos);                 
-        delay(5);                          
-    }
-    
+    // calculate the 4 light values
+    int N = A.read() + B.read() / 2;
+    int E = B.read() + D.read() / 2;
+    int S = C.read() + D.read() / 2;
+    int W = A.read() + C.read() / 2;
+    int avg = A.read() + B.read() + C.read() + D.read() / 4;
+
+    // if (N > S && arm.read() <= 180)
+    //     arm.write(arm.read() - 1);
+    // if (N < S && arm.read() >= 0)
+    //     arm.write(arm.read() + 1);
+
+    // if (E > W && base.read() <= 180)
+    //     base.write(base.read() + 1);
+    // if (E < W && base.read() >= 0)
+    //     base.write(base.read() - 1);
+
+    delay(5);
+
+    LDRdbg();
 }

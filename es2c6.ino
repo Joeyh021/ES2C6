@@ -36,7 +36,7 @@ class PID {
 
     double calculate(double e_t) {
         double I_t = I_t_1 + e_t * t_s;
-        double D_t = e_t - e_t_1 / t_s;
+        double D_t = (e_t - e_t_1) / t_s;
 
         // update values for next call
         e_t_1 = e_t;
@@ -101,5 +101,18 @@ void loop() {
         else
             arm.write(arm.read() + d_arm);
     }
+    Serial.print(N);
+    Serial.print(" ");
+    Serial.print(E);
+    Serial.print(" ");
+    Serial.print(S);
+    Serial.print(" ");
+    Serial.print(W);
+    Serial.print(" ");
+    Serial.print(arm.read());
+    Serial.print(" ");
+    Serial.print(base.read());
+    Serial.print(" ");
+    Serial.println(" ");
     delay(DELAY);
 }

@@ -26,6 +26,11 @@ LDR B(A2);
 LDR C(A1);
 LDR D(A0);
 
+
+#define Kp 0.02
+#define Ki 1
+#define Kd 1
+
 void LDRdbg() {
     Serial.print("LDR Values: A: ");
     Serial.print(A.read());
@@ -38,11 +43,12 @@ void LDRdbg() {
     Serial.println();
 }
 
+
 void setup() {
     // init serial monitor
     Serial.begin(9600);
     arm.attach(9);
-    arm.write(90);
+    arm.write(160);
     base.attach(11);
     base.write(90);
 }
@@ -54,18 +60,35 @@ void loop() {
     int S = C.read() + D.read() / 2;
     int W = A.read() + C.read() / 2;
     int avg = A.read() + B.read() + C.read() + D.read() / 4;
+    Serial.print(N);
+    Serial.print(" ");
+    Serial.print(E);
+    Serial.print(" ");
+    Serial.print(S);
+    Serial.print(" ");
+    Serial.print(W);
+    Serial.print(" ");
+    Serial.print(arm.read());
+    Serial.print(" ");
+    Serial.print(base.read());
+    Serial.print(" ");
+    Serial.println(" ");
 
-    // if (N > S && arm.read() <= 180)
-    //     arm.write(arm.read() - 1);
-    // if (N < S && arm.read() >= 0)
-    //     arm.write(arm.read() + 1);
+    int baseLight = E - W;
+    int armLight  = S - N;
 
-    // if (E > W && base.read() <= 180)
-    //     base.write(base.read() + 1);
-    // if (E < W && base.read() >= 0)
-    //     base.write(base.read() - 1);
+    int d_base = (E-W) * Kp;
+    int d_arm = (S-N) * Kp;
 
-    delay(5);
+    //update values
+    base.write(base.read() + d_base);
+    if(arm.read() + d_arm < 80)
+      arm.write(80);
+    else
+      arm.write(arm.read() + d_arm);
+    
+    delay(10);
 
-    LDRdbg();
+  
+
 }

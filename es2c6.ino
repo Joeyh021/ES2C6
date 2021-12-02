@@ -2,8 +2,6 @@
 #define ENABLE_ARM 1
 #define ENABLE_BASE 1
 
-#define DELAY 5
-
 class LDR {
    private:
     int val;
@@ -23,24 +21,27 @@ class PID {
     const double Kp;
     const double Ki;
     const double Kd;
-    const double t_s;
 
     double I_t_1;
     double e_t_1;
+    unsigned long t_1;
 
    public:
-    PID(double Kp, double Ki, double Kd, double t_s) : Kp{Kp}, Ki{Ki}, Kd{Kd}, t_s{t_s} {
+    PID(double Kp, double Ki, double Kd) : Kp{Kp}, Ki{Ki}, Kd{Kd} {
         I_t_1 = 0;
         e_t_1 = 0;
+        t_1 = 0;
     }
 
-    double calculate(double e_t) {
+    double calculate(double e_t, unsigned long t) {
+        unsigned long t_s = t - t_1;
         double I_t = I_t_1 + e_t * t_s;
         double D_t = (e_t - e_t_1) / t_s;
 
         // update values for next call
         e_t_1 = e_t;
         I_t_1 = I_t;
+        t_1 = t;
         return Kp * e_t + Ki * I_t + Kd * D_t;
     }
 };
@@ -55,8 +56,8 @@ LDR B(A2);
 LDR C(A1);
 LDR D(A0);
 
-PID arm_controller(0.025, 0.0000, 0.017, DELAY);
-PID base_controller(0.025, 0.0000, 0.017, DELAY);
+PID arm_controller(0.025, 0, 0.017);
+PID base_controller(0.025, 0, 0.017);
 
 void LDRdbg() {
     Serial.print("LDR Values: A: ");
@@ -72,7 +73,6 @@ void LDRdbg() {
 
 void setup() {
     // init serial monitor
-    Serial.begin(9600);
     arm.attach(9);
     arm.write(160);
     base.attach(11);
@@ -89,8 +89,8 @@ void loop() {
     int e_base = E - W;
     int e_arm = S - N;
 
-    double d_base = base_controller.calculate(e_base);
-    double d_arm = arm_controller.calculate(e_arm);
+    double d_base = base_controller.calculate(e_base, micros());
+    double d_arm = arm_controller.calculate(e_arm, micros());
 
     // update values
     if (ENABLE_BASE)
@@ -102,5 +102,4 @@ void loop() {
             arm.write(arm.read() + d_arm);
     }
     LDRdbg();
-    delay(DELAY);
 }

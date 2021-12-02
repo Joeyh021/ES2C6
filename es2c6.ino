@@ -1,8 +1,8 @@
 #include <Servo.h>
-#define ENABLE_ARM true
-#define ENABLE_BASE true
+#define ENABLE_ARM 1
+#define ENABLE_BASE 1
 
-#define DELAY 10
+#define DELAY 5
 
 class LDR {
    private:
@@ -55,8 +55,8 @@ LDR B(A2);
 LDR C(A1);
 LDR D(A0);
 
-PID arm_controller(0.02, 0, 0, DELAY);
-PID base_controller(0.02, 0, 0, DELAY);
+PID arm_controller(0.03, 0.0001, 0.015, DELAY);
+PID base_controller(0.03, 0.0001, 0.015, DELAY);
 
 void LDRdbg() {
     Serial.print("LDR Values: A: ");

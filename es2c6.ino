@@ -55,8 +55,8 @@ LDR B(A2);
 LDR C(A1);
 LDR D(A0);
 
-PID arm_controller(0.03, 0.0001, 0.015, DELAY);
-PID base_controller(0.03, 0.0001, 0.015, DELAY);
+PID arm_controller(0.02, 0.0001, 0.015, DELAY);
+PID base_controller(0.02, 0.0001, 0.015, DELAY);
 
 void LDRdbg() {
     Serial.print("LDR Values: A: ");
@@ -101,18 +101,6 @@ void loop() {
         else
             arm.write(arm.read() + d_arm);
     }
-    Serial.print(N);
-    Serial.print(" ");
-    Serial.print(E);
-    Serial.print(" ");
-    Serial.print(S);
-    Serial.print(" ");
-    Serial.print(W);
-    Serial.print(" ");
-    Serial.print(arm.read());
-    Serial.print(" ");
-    Serial.print(base.read());
-    Serial.print(" ");
-    Serial.println(" ");
+    LDRdbg();
     delay(DELAY);
 }

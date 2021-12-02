@@ -55,8 +55,8 @@ LDR B(A2);
 LDR C(A1);
 LDR D(A0);
 
-PID arm_controller(0.02, 0.0001, 0.015, DELAY);
-PID base_controller(0.02, 0.0001, 0.015, DELAY);
+PID arm_controller(0.025, 0.0001, 0.017, DELAY);
+PID base_controller(0.025, 0.0001, 0.017, DELAY);
 
 void LDRdbg() {
     Serial.print("LDR Values: A: ");

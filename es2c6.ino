@@ -1,10 +1,12 @@
 #include <Servo.h>
+
+// enable servo movement
 #define ENABLE_ARM 1
 #define ENABLE_BASE 1
 
+// LDR class, just a wrapper around an analog pin
 class LDR {
    private:
-    int val;
     const uint8_t pin;
 
    public:
@@ -12,17 +14,21 @@ class LDR {
     }
 
     int read() {
-        return val = analogRead(pin);
+        return analogRead(pin);
     }
 };
 
+// PID controller class for PID control in a discrete time domain
 class PID {
    private:
+    // constants for controller params
     const double Kp;
     const double Ki;
     const double Kd;
 
+    // Integral value at time t-1
     double I_t_1;
+    // error value at time t-1
     double e_t_1;
     unsigned long t_1;
 
@@ -45,19 +51,19 @@ class PID {
         return Kp * e_t + Ki * I_t + Kd * D_t;
     }
 };
+
+// our two servos
 Servo base;
 Servo arm;
+
+// the four LDRS
 // A | B
 // - - -
 // C | D
-
 LDR A(A3);
 LDR B(A2);
 LDR C(A1);
 LDR D(A0);
-
-PID arm_controller(0.025, 0, 0.017);
-PID base_controller(0.025, 0, 0.017);
 
 void LDRdbg() {
     Serial.print("LDR Values: A: ");
@@ -71,8 +77,12 @@ void LDRdbg() {
     Serial.println();
 }
 
+PID arm_controller(0.025, 0, 0.017);
+PID base_controller(0.025, 0, 0.017);
+
 void setup() {
     // init serial monitor
+    Serial.begin(9600);
     arm.attach(9);
     arm.write(160);
     base.attach(11);
@@ -86,6 +96,7 @@ void loop() {
     int S = (C.read() + D.read()) / 2;
     int W = (A.read() + C.read()) / 2;
 
+    // calculate error values
     int e_base = E - W;
     int e_arm = S - N;
 
@@ -96,6 +107,7 @@ void loop() {
     if (ENABLE_BASE)
         base.write(base.read() + d_base);
     if (ENABLE_ARM) {
+        // cap arm at 70 degrees so it doesnt flip backwards
         if (arm.read() + d_arm < 70)
             arm.write(70);
         else

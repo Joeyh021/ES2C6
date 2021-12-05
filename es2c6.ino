@@ -78,8 +78,8 @@ void LDRdbg() {
     Serial.println();
 }
 
-PID arm_controller(0.025, 0, 0.017);
-PID base_controller(0.025, 0, 0.017);
+PID arm_controller(0.03, 0.0, 0.017);
+PID base_controller(0.03, 0.0, 0.017);
 
 void setup() {
     // init serial monitor

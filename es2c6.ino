@@ -41,13 +41,14 @@ class PID {
 
     double calculate(double e_t, unsigned long t) {
         unsigned long t_s = t - t_1;
-        double I_t = I_t_1 + e_t * t_s;
+        double I_t = I_t_1 + ((e_t + e_t_1) / 2) * t_s;
         double D_t = (e_t - e_t_1) / t_s;
 
         // update values for next call
         e_t_1 = e_t;
         I_t_1 = I_t;
         t_1 = t;
+
         return Kp * e_t + Ki * I_t + Kd * D_t;
     }
 };

@@ -10,7 +10,7 @@ class LDR {
     const uint8_t pin;
 
    public:
-    LDR(int pin) : pin{pin} {
+    LDR(uint8_t pin) : pin{pin} {
     }
 
     int read() {
